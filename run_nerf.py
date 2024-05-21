@@ -282,13 +282,14 @@ def train():
     os.makedirs(os.path.join(basedir, expname), exist_ok=True)
     os.makedirs(os.path.join(tensorboardbase, expname), exist_ok=True)
 
-    tensorboard = SummaryWriter(os.path.join(tensorboardbase, expname))
+    tensorboard = SummaryWriter(os.path.join(tensorboardbase, expname), comet_config={"disabled": False})
 
     f = os.path.join(basedir, expname, 'args.txt')
     with open(f, 'w') as file:
         for arg in sorted(vars(args)):
             attr = getattr(args, arg)
             file.write('{} = {}\n'.format(arg, attr))
+            tensorboard.add_hparams({arg: attr}, {})
     if args.config is not None and not args.render_only:
         f = os.path.join(basedir, expname, 'config.txt')
         with open(f, 'w') as file:
@@ -299,11 +300,6 @@ def train():
             file.write("\n============================\n"
                        "||\n"
                        "\\/\n")
-
-    # logs hyperparameter into tensorboard
-    for arg in sorted(vars(args)):
-        attr = getattr(args, arg)
-        tensorboard.add_hparams({arg: attr}, {})
 
     # The DSK module
     if args.kernel_type == 'deformablesparsekernel':
