@@ -300,6 +300,11 @@ def train():
                        "||\n"
                        "\\/\n")
 
+    # logs hyperparameter into tensorboard
+    for arg in sorted(vars(args)):
+        attr = getattr(args, arg)
+        tensorboard.add_hparams({arg: attr}, {})
+
     # The DSK module
     if args.kernel_type == 'deformablesparsekernel':
         kernelnet = DSKnet(len(images), torch.tensor(poses[:, :3, :4]),
